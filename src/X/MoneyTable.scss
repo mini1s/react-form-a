@@ -1,0 +1,84 @@
+.form-a__money-table {
+    border-collapse: collapse;
+
+    &__sublabel {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        color: var(--cornflower-blue);
+    }
+
+    th {
+        font-family: var(--bricolage-grotesque);
+        font-size: var(--t5);
+    }
+
+    td,
+    th {
+        padding: 0.5rem 1rem;
+        border: 0.125rem solid #f0f0f0;
+    }
+
+    td.form-a__money-table__amount,
+    td.form-a__money-table__notes {
+        padding: 0;
+        min-width: 12rem;
+        cursor: text;
+
+        &:hover {
+            background-color: #00000004;
+        }
+
+        &:has(input:read-only) {
+            cursor: default;
+
+            &:hover {
+                background-color: transparent;
+            }
+
+            label,
+            input {
+                cursor: default;
+            }
+        }
+
+        label {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: var(--t6);
+            cursor: text;
+            min-width: none;
+        }
+
+        input {
+            font-family: inherit;
+            font-size: var(--t6);
+            padding: 0;
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: var(--midnight-blue);
+            min-width: none;
+            width: 100%;
+        }
+
+        textarea {
+            padding: 0.5rem 1rem;
+            width: 100%;
+            font-family: inherit;
+            font-size: var(--t6);
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: var(--midnight-blue);
+            resize: none;
+            overflow: hidden;
+            min-height: 1rem;
+            display: flex;
+            align-items: center;
+            min-width: none;
+        }
+    }
+}
