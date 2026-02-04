@@ -18,7 +18,9 @@
     ],
     "sideEffects": false,
     "scripts": {
-        "build": "rimraf dist && tsc && tsc --module CommonJS --outDir dist/cjs --declaration false --emitDeclarationOnly false"
+        "build": "rimraf dist && tsc && tsc --module CommonJS --outDir dist/cjs --declaration false --emitDeclarationOnly false && npm run build:css && npm run copy-scss",
+        "build:css": "sass src:dist --no-source-map",
+        "copy-scss": "copyfiles -u 1 \"src/**/*.scss\" dist"
     },
     "peerDependencies": {
         "@minisquare/react-context": "^1.0.14",
@@ -31,6 +33,7 @@
         "@types/react": "^19.2.11",
         "@types/uuid": "^10.0.0",
         "rimraf": "^6.1.2",
+        "sass": "^1.97.3",
         "typescript": "^5.9.3"
     }
 }
