@@ -1,6 +1,6 @@
 {
     "name": "@minisquare/react-form-a",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Reusable form component A",
     "type": "module",
     "main": "./dist/cjs/index.js",
