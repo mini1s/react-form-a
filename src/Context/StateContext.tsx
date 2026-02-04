@@ -1,5 +1,5 @@
 import React from "react"
-import { Settings } from "../Types"
+import { Settings } from "../Types/index.js"
 
 export type State = {
     settings?: Settings

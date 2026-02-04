@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { useForm, usePath, PathSegment } from "../Context"
+import { useForm, usePath, PathSegment } from "../Context/index.js"
 import { FaDeleteLeft, FaPlus } from "react-icons/fa6"
 
 type FormListProps = {
@@ -22,21 +22,11 @@ const Wrap: React.FC<WrapProps> = ({ pathSegment, children }) => {
     return children
 }
 
-const FormList: React.FC<FormListProps> = ({
-    children,
-    noun,
-    pathSegment,
-    noAdd = false,
-    noRemove = false,
-    noHead = false,
-}) => {
+const FormList: React.FC<FormListProps> = ({ children, noun, pathSegment, noAdd = false, noRemove = false, noHead = false }) => {
     const { getValue, setValue } = useForm()
     const { segments } = usePath()
 
-    const path = useMemo(
-        () => (pathSegment ? [...segments, pathSegment].join(".") : segments.join(".")),
-        [segments, pathSegment],
-    )
+    const path = useMemo(() => (pathSegment ? [...segments, pathSegment].join(".") : segments.join(".")), [segments, pathSegment])
 
     const nounLower = noun.toLowerCase()
     const nounCapitalised = String(nounLower).charAt(0).toUpperCase() + String(nounLower).slice(1)

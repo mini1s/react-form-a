@@ -1,6 +1,6 @@
 import React from "react"
-import { useForm } from "./"
-import { valueFromObject } from "../helpful/helpers"
+import { useForm } from "./index.js"
+import { valueFromObject } from "../helpful/helpers.js"
 
 export type Validator = (value: any, form: Record<string, any>) => true | string | Promise<true | string>
 
@@ -76,9 +76,7 @@ export const ValidationProvider: React.FC<ValidationProviderProps> = ({ children
 
     const validateSection = React.useCallback(
         async (section: string) => {
-            const entries = Array.from(validatorsRef.current.entries()).filter(
-                ([path]) => path.startsWith(`${section}.`) || path === section
-            )
+            const entries = Array.from(validatorsRef.current.entries()).filter(([path]) => path.startsWith(`${section}.`) || path === section)
 
             let flag = true
             const updatedErrors: Errors = {}
@@ -96,7 +94,7 @@ export const ValidationProvider: React.FC<ValidationProviderProps> = ({ children
             setErrors(updatedErrors)
             return flag
         },
-        [form]
+        [form],
     )
 
     const value = React.useMemo<Validation>(
@@ -109,7 +107,7 @@ export const ValidationProvider: React.FC<ValidationProviderProps> = ({ children
             removeError,
             errors,
         }),
-        [addValidator, removeValidator, validateAll, validateSection, getError, removeError, errors]
+        [addValidator, removeValidator, validateAll, validateSection, getError, removeError, errors],
     )
 
     return <ValidationContext.Provider value={value}>{children}</ValidationContext.Provider>

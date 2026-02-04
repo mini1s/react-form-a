@@ -1,9 +1,9 @@
 import React, { ReactElement, useState } from "react"
 import { FaCheck, FaXmark, FaEllipsis, FaArrowRight } from "react-icons/fa6"
-import { useForm, usePage, useTheState } from "../Context"
-import { isObjectEmpty } from "../helpful/helpers"
-import SectionsPage from "./SectionsPage"
-import { BackButton } from "../Elements"
+import { useForm, usePage, useTheState } from "../Context/index.js"
+import { isObjectEmpty } from "../helpful/helpers.js"
+import SectionsPage from "./SectionsPage.js"
+import { BackButton } from "../Elements/index.js"
 
 type TheXProps = {
     completed: boolean

@@ -13,9 +13,6 @@
             "require": "./dist/cjs/index.js"
         }
     },
-    "publishConfig": {
-        "directory": "dist"
-    },
     "files": [
         "dist"
     ],

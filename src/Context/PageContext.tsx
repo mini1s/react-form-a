@@ -1,7 +1,7 @@
 import React from "react"
 
-import SectionsMenuPage from "../Sections/SectionsMenuPage"
-import SectionsPage from "../Sections/SectionsPage"
+import SectionsMenuPage from "../Sections/SectionsMenuPage.js"
+import SectionsPage from "../Sections/SectionsPage.js"
 
 type Allowed = typeof SectionsMenuPage | typeof SectionsPage
 export type AllowedElement = React.ReactElement<any, Allowed>
@@ -64,7 +64,7 @@ export const PageProvider: React.FC<PageProviderProps> = ({ children, grandchild
 
     const value = React.useMemo<Page>(
         () => ({ pageArray, currentPage, pageCount, setPage, nextPage, prevPage, isFirstPage, isLastPage, thePage }),
-        [pageArray, currentPage, pageCount, nextPage, prevPage, isFirstPage, isLastPage, thePage]
+        [pageArray, currentPage, pageCount, nextPage, prevPage, isFirstPage, isLastPage, thePage],
     )
 
     return <PageContext.Provider value={value}>{children}</PageContext.Provider>

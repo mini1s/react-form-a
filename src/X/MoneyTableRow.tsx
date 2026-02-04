@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react"
-import { useForm, usePath } from "../Context"
+import { useForm, usePath } from "../Context/index.js"
 import { FaSterlingSign } from "react-icons/fa6"
 
 type MoneyTableRowProps = {

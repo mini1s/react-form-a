@@ -3,7 +3,7 @@ import { Settings } from "../Types"
 import { FormContext, StateContext, useTheState, ValidationProvider } from "../Context"
 import { useMinHeight } from "@minisquare/react-context"
 import { GetValue, valueFromObject, updateObject } from "../helpful/helpers"
-import { BackButton, Loading } from "../Elements"
+import { BackButton, Loading } from "../Elements/index.js"
 import { FaArrowRight } from "react-icons/fa6"
 import { Link } from "react-router-dom"
 

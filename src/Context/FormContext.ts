@@ -1,5 +1,5 @@
 import React from "react"
-import { GetValue } from "../helpful/helpers"
+import { GetValue } from "../helpful/helpers.js"
 
 export type Form = {
     form: Record<string, any>

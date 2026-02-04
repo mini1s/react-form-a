@@ -1,6 +1,6 @@
 import React from "react"
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6"
-import { PathSegment, useForm, usePage, useTheState, useValidation } from "../Context"
+import { PathSegment, useForm, usePage, useTheState, useValidation } from "../Context/index.js"
 
 type SectionsPageProps = {
     children?: React.ReactNode
