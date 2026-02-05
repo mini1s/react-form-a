@@ -23,7 +23,7 @@ const Wrap: React.FC<WrapProps> = ({ pathSegment, children }) => {
 }
 
 const FormList: React.FC<FormListProps> = ({ children, noun, pathSegment, noAdd = false, noRemove = false, noHead = false }) => {
-    const { getValue, setValue } = useForm()
+    const { getValue, setValue } = useForm<any>()
     const { segments } = usePath()
 
     const path = useMemo(() => (pathSegment ? [...segments, pathSegment].join(".") : segments.join(".")), [segments, pathSegment])
@@ -31,7 +31,8 @@ const FormList: React.FC<FormListProps> = ({ children, noun, pathSegment, noAdd 
     const nounLower = noun.toLowerCase()
     const nounCapitalised = String(nounLower).charAt(0).toUpperCase() + String(nounLower).slice(1)
 
-    const value = getValue(path, "array")
+    const rawValue = getValue(path as any)
+    const value: any[] = Array.isArray(rawValue) ? rawValue : []
 
     const add = () => setValue(path, [...value, {}])
     const remove = (i: number) =>

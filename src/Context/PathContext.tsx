@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo } from "react"
 
-type Path = String[]
+type Path = string[]
 
 const PathContext = createContext<Path>([])
 

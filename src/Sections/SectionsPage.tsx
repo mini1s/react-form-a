@@ -2,26 +2,26 @@ import React from "react"
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6"
 import { PathSegment, useForm, usePage, useTheState, useValidation } from "../Context/index.js"
 
-type SectionsPageProps = {
+export type SectionsPageProps<F extends object> = {
     children?: React.ReactNode
     title: string
     image?: string
-    pathSegment: string
+    pathSegment: keyof F
     show?: boolean
 }
 
-const SectionsPage: React.FC<SectionsPageProps> = ({ title, image, children, pathSegment, show = true }) => {
-    const { form } = useForm()
-    const { validateSection } = useValidation()
-    const { save, markSectionComplete } = useTheState()
+const SectionsPage = <F extends object>(props: SectionsPageProps<F>) => {
+    const { title, image, children, pathSegment, show = true } = props
+
+    const { validateSection } = useValidation<F>()
+    const { save, markSectionComplete } = useTheState<F>()
     const { setPage } = usePage()
 
     if (!show) return null
-
-    if (!markSectionComplete) throw new Error("A formA sections component must have a markSectionComplete function")
+    if (!markSectionComplete) return <>provide a mark section complete function</>
 
     return (
-        <PathSegment segment={pathSegment}>
+        <PathSegment segment={pathSegment as string}>
             <div className="form-a__page form-a__sections-page">
                 <div className="form-a__page__top">
                     <button

@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo } from "react"
 import { useForm, usePath, useValidation, Validator } from "../../Context/index.js"
 import { FaCircleExclamation } from "react-icons/fa6"
+import { DotPaths, ChildKey, SpecificFullPath } from "../../Types/index.js"
 
-type BigTextareaProps = {
+export type BigTextareaProps<F extends object, PParent extends DotPaths<F>, PChild extends ChildKey<F, PParent>> = {
     placeholder?: string
-    pathSegment: string
-    showIf?: (form: Record<string, any>, path?: string) => boolean
-    validate?: Validator
+    pathSegment: PChild
+    showIf?: (form: F, path?: SpecificFullPath<F, PParent, PChild>) => boolean
+    validate?: Validator<F>
 }
 
 const BigTextarea: React.FC<BigTextareaProps> = ({ placeholder, pathSegment, showIf, validate }) => {

@@ -1,12 +1,13 @@
 import React, { useMemo, useEffect } from "react"
 import { FaCheck, FaCircleExclamation } from "react-icons/fa6"
 import { useForm, usePath, useTheState, useValidation, Validator } from "../../Context/index.js"
+import { DotPaths, ChildKey, SpecificFullPath } from "../../Types/index.js"
 
-type CheckboxProps = {
+export type CheckboxProps<F extends object, PParent extends DotPaths<F>, PChild extends ChildKey<F, PParent>> = {
     label: string
-    pathSegment: string
-    showIf?: (form: Record<string, any>, path?: string) => boolean
-    validate?: Validator
+    pathSegment: PChild
+    showIf?: (form: F, path?: SpecificFullPath<F, PParent, PChild>) => boolean
+    validate?: Validator<F>
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({ label, pathSegment, showIf, validate }) => {
@@ -39,7 +40,12 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, pathSegment, showIf, validat
     return (
         <div className="form-a__form__label-checkbox">
             <label className="form-a__form__label-checkbox__input-row">
-                <span className="checkbox" style={{ backgroundColor: value ? settings?.activeColor : "transparent" }}>
+                <span
+                    className="checkbox"
+                    style={{
+                        backgroundColor: value ? settings?.activeColor : "transparent",
+                    }}
+                >
                     <FaCheck />
                     <input
                         type="checkbox"

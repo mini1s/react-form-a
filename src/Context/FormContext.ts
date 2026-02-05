@@ -1,24 +1,24 @@
 import React from "react"
-import { GetValue } from "../helpful/helpers.js"
+import { DotPaths, GetValue, PathValue, SetValue } from "../Types/index.js"
 
-export type Form = {
-    form: Record<string, any>
-    setForm: React.Dispatch<React.SetStateAction<Record<string, any>>>
-    getValue: GetValue
-    setValue: (path: string, value: any) => void
+export type Form<F extends object> = {
+    form: F
+    setForm: React.Dispatch<React.SetStateAction<F>>
+    getValue: GetValue<F>
+    setValue: SetValue<F>
 }
 
-export const FormContext = React.createContext<Form | null>(null)
+export const FormContext = React.createContext<Form<any> | null>(null)
 
-export const useForm = () => {
+export function useForm<F extends object>() {
     const context = React.useContext(FormContext)
     if (!context) throw new Error("useForm must be used within a provider")
-    return context
+    return context as Form<F>
 }
 
-export const useFormField = <T = any>(path: string) => {
-    const { getValue, setValue } = useForm()
+export function useFormField<F extends object, P extends DotPaths<F>>(path: P) {
+    const { getValue, setValue } = useForm<F>()
     const value = getValue(path)
-    const set = React.useCallback((v: any) => setValue(path, v), [setValue, path])
-    return [value as T, set] as const
+    const set = React.useCallback((v: PathValue<F, P>) => setValue(path, v), [setValue, path])
+    return [value, set] as const
 }

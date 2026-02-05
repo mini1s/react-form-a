@@ -1,42 +1,47 @@
 import React, { useEffect, useMemo } from "react"
 import { useForm, usePath, useValidation, Validator } from "../../Context/index.js"
 import { FaCircleExclamation } from "react-icons/fa6"
+import { ChildKey, DotPaths, FullPath, SpecificFullPath } from "../../Types/index.js"
 
-type InputTextProps = {
+export type InputTextProps<F extends object, PParent extends DotPaths<F>, PChild extends ChildKey<F, PParent>> = {
     label: string
     after?: React.ReactNode
     placeholder?: string
-    pathSegment: string
-    showIf?: (form: Record<string, any>, path?: string) => boolean
-    validate?: Validator
+    pathSegment: PChild
+    showIf?: (form: F, path?: SpecificFullPath<F, PParent, PChild>) => boolean
+    validate?: Validator<F>
 }
 
-const InputText: React.FC<InputTextProps> = ({ label, after, placeholder, pathSegment, showIf, validate }) => {
-    const { getError, removeError, addValidator, removeValidator } = useValidation()
-    const { getValue, setValue, form } = useForm()
-    const { segments, string } = usePath()
+const InputText = <F extends object, PParent extends DotPaths<F>, PChild extends ChildKey<F, PParent>>({
+    label,
+    after,
+    placeholder,
+    pathSegment,
+    showIf,
+    validate,
+}: InputTextProps<F, PParent, PChild>) => {
+    const { getError, removeError, addValidator, removeValidator } = useValidation<F>()
+    const { getValue, setValue, form } = useForm<F>()
+    const { segments } = usePath()
 
-    const path = useMemo(() => [...segments, pathSegment].join("."), [segments, pathSegment])
-    const show = useMemo(() => (showIf ? showIf(form, string) : true), [showIf, form])
+    const path = useMemo(() => [...segments, pathSegment].join(".") as SpecificFullPath<F, PParent, PChild>, [segments, pathSegment])
+    const show = useMemo(() => (showIf ? showIf(form, path) : true), [showIf, form])
 
-    const value = getValue(path, "string")
-    const error = getError(path)
-
-    useEffect(() => {
-        if (path.split(".").includes("employmentHistory")) console.log(path)
-    }, [path])
+    const rawValue = getValue(path as any)
+    const value = (rawValue ?? "") as string
+    const error = getError(path as any)
 
     useEffect(() => {
         if (!show) {
-            if (error) removeError(path)
-            if (value !== undefined) setValue(path, undefined)
+            if (error) removeError(path as any)
+            if (rawValue !== undefined) setValue(path as any, undefined as any)
         }
     }, [show, path, value, setValue, removeError])
 
     useEffect(() => {
         if (!validate || !show) return
-        addValidator(path, validate)
-        return () => removeValidator(path)
+        addValidator(path as any, validate)
+        return () => removeValidator(path as any)
     }, [validate, show, path])
 
     if (!show) return null
@@ -53,8 +58,8 @@ const InputText: React.FC<InputTextProps> = ({ label, after, placeholder, pathSe
                     placeholder={placeholder || label}
                     value={value}
                     onChange={(e) => {
-                        setValue(path, e.target.value)
-                        removeError(path)
+                        setValue(path as any, e.target.value as any)
+                        removeError(path as any)
                     }}
                 />
                 {after && after}

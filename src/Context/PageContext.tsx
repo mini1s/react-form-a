@@ -1,14 +1,16 @@
 import React from "react"
 
-import SectionsMenuPage from "../Sections/SectionsMenuPage.js"
-import SectionsPage from "../Sections/SectionsPage.js"
+import SectionsMenuPage, { SectionsMenuPageProps } from "../Sections/SectionsMenuPage.js"
+import SectionsPage, { SectionsPageProps } from "../Sections/SectionsPage.js"
 
-type Allowed = typeof SectionsMenuPage | typeof SectionsPage
-export type AllowedElement = React.ReactElement<any, Allowed>
-export type AllowedPages = AllowedElement | AllowedElement[]
+type SectionsPageElement<F extends object> = React.ReactElement<SectionsPageProps<F>, typeof SectionsPage>
+type SectionsMenuElement<F extends object> = React.ReactElement<SectionsMenuPageProps<F>, typeof SectionsMenuPage>
 
-type Page = {
-    pageArray: AllowedElement[]
+export type AllowedElement<F extends object> = SectionsPageElement<F> | SectionsMenuElement<F>
+export type AllowedPages<F extends object> = AllowedElement<F> | AllowedElement<F>[]
+
+type Page<F extends object> = {
+    pageArray: AllowedElement<F>[]
     currentPage: number
     pageCount: number
     setPage: React.Dispatch<React.SetStateAction<number>>
@@ -19,12 +21,12 @@ type Page = {
     thePage: React.ReactNode
 }
 
-type PageProviderProps = {
+type PageProviderProps<F extends object> = {
     children: React.ReactNode
-    grandchildren: AllowedPages
+    grandchildren: AllowedPages<F>
 }
 
-const PageContext = React.createContext<Page | null>(null)
+const PageContext = React.createContext<Page<any> | null>(null)
 
 export const usePage = () => {
     const context = React.useContext(PageContext)
@@ -32,13 +34,13 @@ export const usePage = () => {
     return context
 }
 
-export const PageProvider: React.FC<PageProviderProps> = ({ children, grandchildren }) => {
-    const pageArray = React.useMemo<AllowedElement[]>(() => {
+export const PageProvider = <F extends object>({ children, grandchildren }: PageProviderProps<F>) => {
+    const pageArray = React.useMemo<AllowedElement<F>[]>(() => {
         const pages = Array.isArray(grandchildren) ? [...grandchildren] : [grandchildren]
 
         return pages.filter((page) => {
             if (page.type === SectionsPage) {
-                const show: boolean | undefined = page.props?.show
+                const show: boolean | undefined = (page as any).props?.show
                 return show !== false
             }
 
@@ -62,7 +64,7 @@ export const PageProvider: React.FC<PageProviderProps> = ({ children, grandchild
     const isFirstPage = currentPage === 0
     const isLastPage = currentPage === pageCount - 1
 
-    const value = React.useMemo<Page>(
+    const value: Page<F> = React.useMemo(
         () => ({ pageArray, currentPage, pageCount, setPage, nextPage, prevPage, isFirstPage, isLastPage, thePage }),
         [pageArray, currentPage, pageCount, nextPage, prevPage, isFirstPage, isLastPage, thePage],
     )

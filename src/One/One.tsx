@@ -1,8 +1,8 @@
 import React from "react"
-import { Settings } from "../Types"
-import { FormContext, StateContext, useTheState, ValidationProvider } from "../Context/index.js"
+import { Settings, SetValue, GetValue } from "../Types/index.js"
+import { Form, FormContext, State, StateContext, useTheState, ValidationProvider } from "../Context/index.js"
 import { useMinHeight } from "@minisquare/react-context"
-import { GetValue, valueFromObject, updateObject } from "../helpful/helpers.js"
+import { valueFromObject, updateObject } from "../helpful/helpers.js"
 import { BackButton, Loading } from "../Elements/index.js"
 import { FaArrowRight } from "react-icons/fa6"
 import { Link } from "react-router-dom"
@@ -41,12 +41,12 @@ const OneChild: React.FC<OneChildProps> = ({ children }) => {
     return children
 }
 
-type OneProps = {
+type OneProps<F extends object> = {
     backgroundImage?: string
     settings?: Settings
     children: React.ReactNode
-    form: Record<string, any>
-    setForm: React.Dispatch<React.SetStateAction<Record<string, any>>>
+    form: F
+    setForm: React.Dispatch<React.SetStateAction<F>>
     loading: boolean
     saving: boolean
     submitted: boolean
@@ -54,15 +54,28 @@ type OneProps = {
     submit: () => Promise<void | boolean> | void | boolean
 }
 
-const One: React.FC<OneProps> = ({ backgroundImage, children, form, setForm, settings, loading, saving, save, submit, submitted }) => {
+const One = <F extends object>(props: OneProps<F>) => {
+    const { backgroundImage, children, form, setForm, settings, loading, saving, save, submit, submitted } = props
+
     const { minHeight } = useMinHeight()
 
-    const getValue = React.useCallback<GetValue>((path: string, type?: any) => valueFromObject(form, path, type), [form])
-    const setValue = React.useCallback((path: string, value: any) => updateObject(setForm, path, value), [setForm])
+    const setValue = React.useCallback<SetValue<F>>(
+        ((path, value) => {
+            updateObject(setForm, path as any, value as any)
+        }) as SetValue<F>,
+        [setForm],
+    )
 
-    const formProviderValue = React.useMemo(() => ({ form, setForm, getValue, setValue }), [form, setForm, getValue, setValue])
+    const getValue = React.useCallback(
+        ((path: string) => {
+            return valueFromObject(form, path as any)
+        }) as GetValue<F>,
+        [form],
+    )
 
-    const stateProviderValue = React.useMemo(
+    const formProviderValue: Form<F> = React.useMemo(() => ({ form, setForm, getValue, setValue }), [form, setForm, getValue, setValue])
+
+    const stateProviderValue: State<F> = React.useMemo(
         () => ({ settings, loading, saving, save, submit, submitted }),
         [settings, loading, saving, save, submit, submitted],
     )

@@ -2,7 +2,7 @@ import React, { ReactElement, useState } from "react"
 import { FaCheck, FaXmark, FaEllipsis, FaArrowRight } from "react-icons/fa6"
 import { useForm, usePage, useTheState } from "../Context/index.js"
 import { isObjectEmpty } from "../helpful/helpers.js"
-import SectionsPage from "./SectionsPage.js"
+import SectionsPage, { SectionsPageProps } from "./SectionsPage.js"
 import { BackButton } from "../Elements/index.js"
 
 type TheXProps = {
@@ -10,11 +10,11 @@ type TheXProps = {
     started: boolean
 }
 
-type SectionsMenuPageProps = {
+export type SectionsMenuPageProps<F extends object> = {
     title: string
     image?: string
     children?: React.ReactNode
-    completeSections: Record<string, boolean>
+    completeSections: Partial<Record<keyof F, boolean>>
 }
 
 const TheIcon: React.FC<TheXProps> = ({ completed, started }) => {
@@ -29,18 +29,20 @@ const TheStatus: React.FC<TheXProps> = ({ completed, started }) => {
     return <>Not started</>
 }
 
-const SectionsMenuPage: React.FC<SectionsMenuPageProps> = ({ title, children, image, completeSections }) => {
+const SectionsMenuPage = <F extends object>({ title, children, image, completeSections }: SectionsMenuPageProps<F>) => {
     const { setPage, pageArray } = usePage()
-    const { getValue } = useForm()
-    const { markSectionComplete, submit } = useTheState()
+    const { getValue } = useForm<F>()
+    const { markSectionComplete, submit } = useTheState<F>()
 
     const [submitting, setSubmitting] = useState<boolean>(false)
 
     if (!markSectionComplete) throw new Error("A formA sections component must have a markSectionComplete function")
 
     const { normalPages, isComplete } = React.useMemo(() => {
-        const normalPages = pageArray.map((page, j) => ({ ...page, j })).filter((page) => page.type === SectionsPage)
-        const sections = normalPages.map((page) => page.props.pathSegment)
+        const normalPages = pageArray.map((page, j) => ({ ...page, j })).filter((page) => page.type === SectionsPage) as Array<
+            ReactElement<SectionsPageProps<F>> & { j: number }
+        >
+        const sections = normalPages.map((page) => page.props.pathSegment as keyof F)
         let isComplete = true
         for (const section of sections) {
             if (!completeSections[section]) isComplete = false
@@ -58,9 +60,9 @@ const SectionsMenuPage: React.FC<SectionsMenuPageProps> = ({ title, children, im
             </div>
             <div className="form-a__sections-menu__list">
                 {normalPages.map((page, i) => {
-                    const path = page.props.pathSegment
+                    const path = page.props.pathSegment as keyof F
                     const completed = completeSections[path]
-                    const started = !isObjectEmpty(getValue(path))
+                    const started = !isObjectEmpty(getValue(path as any))
 
                     return (
                         <div
@@ -72,12 +74,12 @@ const SectionsMenuPage: React.FC<SectionsMenuPageProps> = ({ title, children, im
                         >
                             <div className="form-a__sections-menu__left">
                                 <div className="form-a__sections-menu__icon">
-                                    <TheIcon completed={completed} started={started} />
+                                    <TheIcon completed={completed ?? false} started={started} />
                                 </div>
                                 <div>
                                     <h2 className="t4">{page.props.title}</h2>
                                     <p className="t7">
-                                        <TheStatus completed={completed} started={started} />
+                                        <TheStatus completed={completed ?? false} started={started} />
                                     </p>
                                 </div>
                             </div>

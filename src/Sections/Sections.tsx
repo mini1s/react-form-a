@@ -1,23 +1,23 @@
 import React from "react"
 import { useMinHeight } from "@minisquare/react-context"
-import { Settings } from "../Types/index.js"
-import { FormContext, PageProvider, AllowedPages, StateContext, ValidationProvider, usePage, useTheState } from "../Context/index.js"
-import { GetValue, updateObject, valueFromObject } from "../helpful/helpers.js"
+import { DotPaths, GetValue, PathValue, Settings, SetValue } from "../Types/index.js"
+import { FormContext, PageProvider, AllowedPages, StateContext, ValidationProvider, usePage, useTheState, State, Form } from "../Context/index.js"
+import { updateObject, valueFromObject } from "../helpful/helpers.js"
 import { BackButton, Loading } from "../Elements/index.js"
 import { Link, useParams } from "react-router-dom"
 import { FaArrowRight } from "react-icons/fa6"
 
-type SectionsProps = {
+type SectionsProps<F extends object> = {
     backgroundImage?: string
     settings?: Settings
-    children: AllowedPages
-    form: Record<string, any>
-    setForm: React.Dispatch<React.SetStateAction<Record<string, any>>>
+    children: AllowedPages<F>
+    form: F
+    setForm: React.Dispatch<React.SetStateAction<F>>
     loading: boolean
     saving: boolean
     submitted: boolean
     save: () => Promise<void | boolean> | void | boolean
-    markSectionComplete: (section: string, complete?: boolean) => Promise<void> | void
+    markSectionComplete: (section: keyof F, complete?: boolean) => Promise<void> | void
     submit: () => Promise<void | boolean> | void | boolean
 }
 
@@ -44,9 +44,9 @@ const SubmittedPage = () => {
     )
 }
 
-const SectionsChild = () => {
+const SectionsChild = <F extends object>() => {
     const { thePage } = usePage()
-    const { loading, submitted } = useTheState()
+    const { loading, submitted } = useTheState<F>()
 
     if (loading) return <LoadingPage />
     if (submitted) return <SubmittedPage />
@@ -54,28 +54,37 @@ const SectionsChild = () => {
     return thePage
 }
 
-const Sections: React.FC<SectionsProps> = ({
-    backgroundImage,
-    children,
-    form,
-    setForm,
-    settings,
-    loading,
-    saving,
-    save,
-    markSectionComplete,
-    submit,
-    submitted,
-}) => {
+const Sections = <F extends object>(props: SectionsProps<F>) => {
+    const { backgroundImage, children, form, setForm, settings, loading, saving, save, markSectionComplete, submit, submitted } = props
+
     const { minHeight } = useMinHeight()
 
-    const getValue = React.useCallback<GetValue>((path: string, type?: any) => valueFromObject(form, path, type), [form])
-    const setValue = React.useCallback((path: string, value: any) => updateObject(setForm, path, value), [setForm])
+    const setValue = React.useCallback<SetValue<F>>(
+        ((path, value) => {
+            updateObject(setForm, path as any, value as any)
+        }) as SetValue<F>,
+        [setForm],
+    )
 
-    const formProviderValue = React.useMemo(() => ({ form, setForm, getValue, setValue }), [form, setForm, getValue, setValue])
+    const getValue = React.useCallback(
+        ((path: string) => {
+            return valueFromObject(form, path as any)
+        }) as GetValue<F>,
+        [form],
+    )
 
-    const stateProviderValue = React.useMemo(
-        () => ({ settings, loading, saving, save, markSectionComplete, submit, submitted }),
+    const formProviderValue: Form<F> = React.useMemo(() => ({ form, setForm, getValue, setValue }), [form, setForm, getValue, setValue])
+
+    const stateProviderValue: State<F> = React.useMemo(
+        () => ({
+            settings,
+            loading,
+            saving,
+            save,
+            markSectionComplete,
+            submit,
+            submitted,
+        }),
         [settings, loading, saving, save, markSectionComplete, submit, submitted],
     )
 
@@ -86,7 +95,7 @@ const Sections: React.FC<SectionsProps> = ({
                     <ValidationProvider>
                         <div className="form-a form-a--sections" style={{ minHeight }}>
                             {backgroundImage && <img src={backgroundImage} alt="" className="form-a__background-image" />}
-                            <SectionsChild />
+                            <SectionsChild<F> />
                         </div>
                     </ValidationProvider>
                 </PageProvider>

@@ -1,98 +1,32 @@
-import { Timestamp } from "firebase/firestore"
+import { DotPaths, PathValue } from "../Types"
 
-export type TypeStrings = "undefined" | "object" | "boolean" | "number" | "string" | "function" | "array" | "timestamp"
+export function valueFromObject<Obj extends object, P extends DotPaths<Obj>>(object: Obj | undefined, path: P | undefined): PathValue<Obj, P> | undefined {
+    if (!object || !path) return undefined
 
-export type TypeMap = {
-    undefined: undefined
-    object: Record<string, unknown>
-    boolean: boolean
-    number: number
-    string: string
-    function: (...args: any[]) => unknown
-    array: unknown[]
-    timestamp: Timestamp
-}
-
-const DEFAULTS = {
-    undefined: undefined,
-    object: {} as Record<string, unknown>,
-    boolean: false,
-    number: 0,
-    string: "",
-    function: ((..._args: any[]) => undefined) as (...args: any[]) => unknown,
-    array: [] as unknown[],
-    timestamp: undefined as unknown as Timestamp,
-} satisfies { [K in TypeStrings]: TypeMap[K] }
-
-function defaultValueFromTypeString<T extends TypeStrings>(theType: T): TypeMap[T] {
-    return DEFAULTS[theType]
-}
-
-function isRuntimeType<T extends TypeStrings>(value: unknown, theType: T): value is TypeMap[T] {
-    if (theType === "array") return Array.isArray(value)
-    if (theType === "object") return typeof value === "object" && value !== null && !Array.isArray(value)
-    if (theType === "timestamp") return value instanceof Timestamp
-    return typeof value === theType
-}
-
-export function valueFromObject<T extends TypeStrings>(
-    object: Record<string, any> | undefined,
-    path: string | undefined,
-    theType: T
-): TypeMap[T]
-export function valueFromObject(object: Record<string, any> | undefined, path: string | undefined): unknown
-
-export function valueFromObject(
-    object: Record<string, any> | undefined,
-    path: string | undefined,
-    theType?: TypeStrings
-) {
-    if (!object) return theType ? defaultValueFromTypeString(theType) : undefined
-
-    const keys = (path ?? "").split(".").filter(Boolean)
+    const keys = path.split(".").filter(Boolean)
 
     let acc: unknown = object
+
     for (const key of keys) {
         if (acc == null) {
-            // handles null/undefined mid-path
-            acc = undefined
-            break
+            return undefined
         }
         acc = (acc as Record<string, unknown>)[key]
     }
 
-    const value = acc
-
-    if (theType) {
-        if (isRuntimeType(value, theType)) {
-            return value
-        }
-        return defaultValueFromTypeString(theType)
-    }
-
-    return value
+    return acc as PathValue<Obj, P> | undefined
 }
 
-export type GetValue = {
-    <T extends TypeStrings>(path: string, theType: T): TypeMap[T]
-    (path: string): unknown
-}
-
-export function updateObject(
-    setObject: React.Dispatch<React.SetStateAction<object>>,
-    path: string | string[],
-    value: any
-) {
+export function updateObject<F extends object, P extends DotPaths<F>>(setObject: React.Dispatch<React.SetStateAction<F>>, path: P, value: PathValue<F, P>) {
     setObject((prevObject) => {
-        const newObject = Array.isArray(prevObject) ? [...prevObject] : { ...prevObject }
-        let current = newObject
+        const newObject = (Array.isArray(prevObject) ? [...prevObject] : { ...prevObject }) as F
 
-        if (typeof path === "string") path = path.split(".")
+        const splitPath = path.split(".")
 
-        path.reduce((weakAcc, key, i) => {
+        splitPath.reduce((weakAcc, key, i) => {
             const acc = weakAcc as Record<string, any>
-            const isLast = i === path.length - 1
-            const nextKey = path[i + 1]
+            const isLast = i === splitPath.length - 1
+            const nextKey = splitPath[i + 1]
             const isNextIndex = !isNaN(Number(nextKey))
 
             if (isLast) {
@@ -108,7 +42,7 @@ export function updateObject(
             }
 
             return acc[key]
-        }, current)
+        }, newObject)
 
         return newObject
     })

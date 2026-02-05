@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo } from "react"
 import { usePath, useForm, Validator, useValidation } from "../../Context/index.js"
 import { FaCircleExclamation } from "react-icons/fa6"
+import { DotPaths, ChildKey, SpecificFullPath } from "../../Types/index.js"
 
-type InputDateProps = {
+export type InputDateProps<F extends object, PParent extends DotPaths<F>, PChild extends ChildKey<F, PParent>> = {
     label: string
-    pathSegment: string
-    showIf?: (form: Record<string, any>, path?: string) => boolean
-    validate?: Validator
+    pathSegment: PChild
+    showIf?: (form: F, path?: SpecificFullPath<F, PParent, PChild>) => boolean
+    validate?: Validator<F>
 }
 
 const InputDate: React.FC<InputDateProps> = ({ label, pathSegment, showIf, validate }) => {
